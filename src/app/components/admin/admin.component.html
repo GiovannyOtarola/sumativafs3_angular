@@ -1,0 +1,48 @@
+<div *ngIf="editingUser">
+    <h2>Editar Usuario</h2>
+    <form [formGroup]="editUserForm" (ngSubmit)="updateUser()">
+      <div>
+        <label for="username">Nombre de usuario</label>
+        <input id="username" formControlName="username" />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" formControlName="email" />
+      </div>
+      <div>
+        <label for="password">Contraseña</label>
+        <input id="password" formControlName="password" type="password" />
+      </div>
+      <div>
+        <label for="role">Rol</label>
+        <select id="role" formControlName="role">
+          <option value="admin">Administrador</option>
+          <option value="user">Usuario</option>
+        </select>
+      </div>
+      <button type="submit">Actualizar Usuario</button>
+      <button type="button" (click)="cancelEdit()">Cancelar</button>
+    </form>
+    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  </div>
+  
+  <h2>Usuarios</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre de usuario</th>
+        <th>Email</th>
+        <th>Rol</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of users">
+        <td>{{ user.username }}</td>
+        <td>{{ user.email }}</td>
+        <td>{{ user.role }}</td>
+        <td><button (click)="editUser(user)">Editar</button></td>
+      </tr>
+    </tbody>
+  </table>

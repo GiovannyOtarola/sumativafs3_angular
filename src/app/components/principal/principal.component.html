@@ -1,0 +1,44 @@
+<div *ngIf="editingProducto">
+    <h2>{{ editingProducto ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+    <form [formGroup]="productoForm" (ngSubmit)="saveProducto()">
+      <div>
+        <label for="nombre">Nombre</label>
+        <input id="nombre" formControlName="nombre" />
+      </div>
+      <div>
+        <label for="descripcion">Descripción</label>
+        <input id="descripcion" formControlName="descripcion" />
+      </div>
+      <div>
+        <label for="precio">Precio</label>
+        <input id="precio" formControlName="precio" type="number" />
+      </div>
+      <button type="submit">{{ editingProducto ? 'Actualizar Producto' : 'Crear Producto' }}</button>
+      <button type="button" (click)="cancelEdit()">Cancelar</button>
+    </form>
+    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
+    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  </div>
+  
+  <h2>Lista de Productos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Precio</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let producto of productos">
+        <td>{{ producto.nombre }}</td>
+        <td>{{ producto.descripcion }}</td>
+        <td>{{ producto.precio | currency }}</td>
+        <td>
+          <button (click)="editProducto(producto)">Editar</button>
+          <button (click)="deleteProducto(producto.id)">Eliminar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
