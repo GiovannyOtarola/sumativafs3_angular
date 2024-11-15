@@ -3,11 +3,12 @@ import { AuthService } from '../services/auth.service';
 import { User } from '../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule,RouterModule],
   templateUrl: './perfil.component.html',
   styleUrl: './perfil.component.css'
 })
@@ -17,19 +18,20 @@ export class PerfilComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService,private router: Router) {}
 
   ngOnInit(): void {
-    // Suscribirse para obtener el usuario actual
     this.authService.getCurrentUser().subscribe((user) => {
       if (user) {
+        console.log('Usuario actual:', user); // Añadir log
         this.user = user;
-        // Crear una copia del usuario para edición sin el campo "role"
         this.editableUser = {
           username: user.username,
           email: user.email,
-          password: user.password // Si el usuario puede actualizar su contraseña
+          password: user.password
         };
+      } else {
+        this.router.navigate(['/login']); // Añadir log
       }
     });
   }

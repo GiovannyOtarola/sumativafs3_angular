@@ -13,6 +13,6 @@ export const routes: Routes = [
     {path: 'perfil', component: PerfilComponent},
     {path: 'principal', component: PrincipalComponent},
     {path: 'registro', component: RegistroComponent},
-    {path: 'recuperar-password', component: RecuperarPasswordComponent},
+    {path: 'recuperar', component: RecuperarPasswordComponent},
     {path: 'admin', component: AdminComponent},
 ];

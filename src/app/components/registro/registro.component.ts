@@ -1,11 +1,12 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service';
-import { FormBuilder, FormGroup, Validators,AbstractControl , ValidationErrors  } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators,AbstractControl , ValidationErrors, ReactiveFormsModule  } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [],
+  imports: [CommonModule,ReactiveFormsModule],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css'
 })

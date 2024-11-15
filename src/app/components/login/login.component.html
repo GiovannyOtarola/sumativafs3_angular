@@ -1,7 +1,7 @@
 <div class="login-container">
     <h2>Inicio de Sesión</h2>
   
-    <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
       <div>
         <label for="email">Correo electrónico:</label>
         <input id="email" formControlName="email" type="email" />

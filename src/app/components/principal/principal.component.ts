@@ -18,7 +18,6 @@ export class PrincipalComponent implements OnInit {
   errorMessage: string = '';
 
   constructor(private productoService: ProductoService, private fb: FormBuilder) {
-    // Inicialización del formulario
     this.productoForm = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
@@ -41,14 +40,15 @@ export class PrincipalComponent implements OnInit {
     }
 
     const producto: Producto = this.productoForm.value;
-    
+
     if (this.editingProducto) {
-      // Actualizar producto
+      // Si estamos editando un producto, lo actualizamos
       producto.id = this.editingProducto.id; // Mantener el id
       this.productoService.updateProducto(producto).subscribe(response => {
         if (response.success) {
           this.successMessage = 'Producto actualizado correctamente.';
           this.errorMessage = '';
+          // Actualizar la lista de productos después de la edición
           this.productoService.getAllProductos().subscribe(productos => {
             this.productos = productos;
           });
@@ -57,13 +57,23 @@ export class PrincipalComponent implements OnInit {
         }
       });
     } else {
-      // Crear nuevo producto
-      const newId = this.productos.length + 1; // Generar nuevo id
+      // Si estamos agregando un nuevo producto
+      // Verificar que no exista un producto con el mismo nombre
+      const existingProduct = this.productos.find(p => p.nombre === producto.nombre);
+      if (existingProduct) {
+        this.errorMessage = 'El producto ya existe.';
+        return;
+      }
+  
+      // Generar un id único para el nuevo producto
+      const newId = this.productos.length ? Math.max(...this.productos.map(p => p.id)) + 1 : 1;
       producto.id = newId;
+  
       this.productoService.addProducto(producto).subscribe(response => {
         if (response.success) {
           this.successMessage = 'Producto creado correctamente.';
           this.errorMessage = '';
+          // Obtener todos los productos después de agregar uno nuevo
           this.productoService.getAllProductos().subscribe(productos => {
             this.productos = productos;
           });

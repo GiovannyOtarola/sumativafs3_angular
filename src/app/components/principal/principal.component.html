@@ -1,27 +1,38 @@
-<div *ngIf="editingProducto">
-    <h2>{{ editingProducto ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
-    <form [formGroup]="productoForm" (ngSubmit)="saveProducto()">
-      <div>
-        <label for="nombre">Nombre</label>
-        <input id="nombre" formControlName="nombre" />
-      </div>
-      <div>
-        <label for="descripcion">Descripción</label>
-        <input id="descripcion" formControlName="descripcion" />
-      </div>
-      <div>
-        <label for="precio">Precio</label>
-        <input id="precio" formControlName="precio" type="number" />
-      </div>
-      <button type="submit">{{ editingProducto ? 'Actualizar Producto' : 'Crear Producto' }}</button>
-      <button type="button" (click)="cancelEdit()">Cancelar</button>
-    </form>
-    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
-  </div>
-  
-  <h2>Lista de Productos</h2>
-  <table>
+<div class="container">
+  <h2>Productos</h2>
+
+  <!-- Mensajes de éxito o error -->
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <!-- Formulario para agregar o editar un producto -->
+  <form [formGroup]="productoForm" (ngSubmit)="saveProducto()">
+    <div class="form-group">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" formControlName="nombre" class="form-control" />
+    </div>
+
+    <div class="form-group">
+      <label for="descripcion">Descripción</label>
+      <textarea id="descripcion" formControlName="descripcion" class="form-control"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label for="precio">Precio</label>
+      <input type="number" id="precio" formControlName="precio" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="productoForm.invalid">
+      {{ editingProducto ? 'Actualizar Producto' : 'Agregar Producto' }}
+    </button>
+
+    <!-- Botón para cancelar la edición -->
+    <button *ngIf="editingProducto" (click)="cancelEdit()" type="button" class="btn btn-secondary">Cancelar</button>
+  </form>
+
+  <!-- Lista de productos -->
+  <h3>Lista de Productos</h3>
+  <table class="table">
     <thead>
       <tr>
         <th>Nombre</th>
@@ -36,9 +47,10 @@
         <td>{{ producto.descripcion }}</td>
         <td>{{ producto.precio | currency }}</td>
         <td>
-          <button (click)="editProducto(producto)">Editar</button>
-          <button (click)="deleteProducto(producto.id)">Eliminar</button>
+          <button (click)="editProducto(producto)" class="btn btn-warning">Editar</button>
+          <button (click)="deleteProducto(producto.id)" class="btn btn-danger">Eliminar</button>
         </td>
       </tr>
     </tbody>
   </table>
+</div>

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component,OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
@@ -11,42 +11,62 @@ import { CommonModule } from '@angular/common';
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
+  email: string = '';
+  password: string = '';
+  errorMessage: string = '';
   loginForm: FormGroup;
-  errorMessage: string | null = null;
 
   constructor(
-    private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private fb: FormBuilder  // Inyectamos FormBuilder para crear el formulario
   ) {
+    // Inicializamos loginForm
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
+      password: ['', [Validators.required]]
     });
   }
 
-  onLogin() {
-    if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe({
-        next: (response) => {
-          if (response.success) {
-            const userRole = response.user.role; // Obtener el rol del usuario
-
-            // Redirigir según el rol del usuario
-            if (userRole === 'admin') {
-              this.router.navigate(['/admin']);
-            } else if (userRole === 'user') {
-              this.router.navigate(['/principal']);
-            }
-          } else {
-            this.errorMessage = response.message || 'Credenciales incorrectas';
-          }
-        },
-        error: () => {
-          this.errorMessage = 'Error en el inicio de sesión';
+  ngOnInit(): void {
+    // Si ya hay un usuario logueado, redirige a la página correspondiente
+    this.authService.getCurrentUser().subscribe((user) => {
+      if (user) {
+        if (user.role === 'admin') {
+          this.router.navigate(['/admin']);
+        } else if (user.role === 'user') {
+          this.router.navigate(['/principal']);
         }
-      });
-    }
+      }
+    });
+  }
+
+  login(): void {
+    const { email, password } = this.loginForm.value;
+    this.authService.login({ email, password }).subscribe(
+      (response: any) => {
+        if (response.success) {
+          this.authService.getCurrentUser().subscribe((user) => {
+            if (user) {
+              if (user.role === 'admin') {
+                this.router.navigate(['/admin']);
+              } else if (user.role === 'user') {
+                this.router.navigate(['/principal']);
+              } else {
+                this.errorMessage = 'El usuario no tiene un rol asignado.';
+              }
+            } else {
+              this.errorMessage = 'Usuario no encontrado.';
+            }
+          });
+        } else {
+          this.errorMessage = response.message || 'Error al intentar iniciar sesión.';
+        }
+      },
+      (error) => {
+        this.errorMessage = 'Error de conexión o datos incorrectos. Inténtalo de nuevo.';
+      }
+    );
   }
 }
