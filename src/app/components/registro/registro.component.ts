@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { AuthService } from '../services/auth.service';
 import { FormBuilder, FormGroup, Validators,AbstractControl , ValidationErrors, ReactiveFormsModule  } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule,ReactiveFormsModule,RouterModule],
   templateUrl: './registro.component.html',
   styleUrl: './registro.component.css'
 })
@@ -16,7 +17,7 @@ export class RegistroComponent {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
+  constructor(private fb: FormBuilder, private authService: AuthService,private router: Router) {
     this.registerForm = this.fb.group({
       username: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -58,6 +59,10 @@ export class RegistroComponent {
             this.successMessage = 'Registro exitoso!';
             this.errorMessage = null;
             this.registerForm.reset();
+
+            setTimeout(() => {
+              this.router.navigate(['/login']);
+            }, 2000);
           }
         },
         error: () => {

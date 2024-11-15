@@ -22,4 +22,10 @@
     </form>
   
     <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+    <div class="navigation-buttons">
+      <button (click)="redirectToRegister()">Registrarse</button>
+      <button (click)="redirectToRecoverPassword()">Recuperar Contraseña</button>
+    </div>
+    
   </div>

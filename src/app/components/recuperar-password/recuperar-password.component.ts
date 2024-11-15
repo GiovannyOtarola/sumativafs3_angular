@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { AuthService, User } from '../services/auth.service';
 import { FormBuilder, Validators, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-recuperar-password',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule,ReactiveFormsModule,RouterModule],
   templateUrl: './recuperar-password.component.html',
   styleUrl: './recuperar-password.component.css'
 })
@@ -14,7 +15,7 @@ export class RecuperarPasswordComponent {
   recuperarForm: FormGroup;
   mensaje: string = '';
 
-  constructor(private authService: AuthService, private fb: FormBuilder) {
+  constructor(private authService: AuthService, private fb: FormBuilder,private router: Router) {
     this.recuperarForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
@@ -32,5 +33,9 @@ export class RecuperarPasswordComponent {
         this.mensaje = 'No se encontró un usuario con ese email';
       }
     });
+  }
+
+  redirectToLogin(): void {
+    this.router.navigate(['/login']);
   }
 }

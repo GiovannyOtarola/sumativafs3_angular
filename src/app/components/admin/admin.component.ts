@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService, User } from '../services/auth.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { SessionService } from '../services/session.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-admin',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule ],
+  imports: [CommonModule,ReactiveFormsModule,RouterModule],
   templateUrl: './admin.component.html',
   styleUrl: './admin.component.css'
 })
@@ -17,7 +19,7 @@ export class AdminComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private fb: FormBuilder) {
+  constructor(private authService: AuthService, private fb: FormBuilder, private sessionService: SessionService,private router: Router,) {
     // Inicialización del formulario de edición
     this.editUserForm = this.fb.group({
       username: ['', Validators.required],
@@ -28,7 +30,14 @@ export class AdminComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Obtener todos los usuarios cuando se inicialice el componente
+    // Verificar si el usuario tiene permisos de administrador
+    const currentUser = this.sessionService.getLoggedInUser();
+    if (!this.sessionService.getSessionStatus() || !currentUser || currentUser.role !== 'admin') {
+      this.router.navigate(['/login']); // Redirigir si no es administrador
+      return;
+    }
+
+    // Obtener todos los usuarios
     this.authService.getAllUsers().subscribe(users => {
       this.users = users;
     });
@@ -61,6 +70,7 @@ export class AdminComponent implements OnInit {
         if (response.success) {
           this.successMessage = 'Usuario actualizado correctamente.';
           this.errorMessage = '';
+          
           // Actualizar la lista de usuarios
           this.authService.getAllUsers().subscribe(users => {
             this.users = users;
@@ -78,5 +88,28 @@ export class AdminComponent implements OnInit {
     this.successMessage = '';
     this.errorMessage = '';
     this.editUserForm.reset();
+  }
+
+  logout(): void {
+    this.sessionService.logout(); // Cierra sesión en el servicio de sesión
+    this.router.navigate(['/login']); // Redirige al login
+  }
+
+  deleteUser(user: User): void {
+    if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
+      this.authService.deleteUser(user).subscribe(response => {
+        if (response.success) {
+          this.successMessage = 'Usuario eliminado correctamente.';
+          this.errorMessage = '';
+          
+          // Actualizar la lista de usuarios después de la eliminación
+          this.authService.getAllUsers().subscribe(users => {
+            this.users = users;
+          });
+        } else {
+          this.errorMessage = response.message || 'Error al eliminar el usuario';
+        }
+      });
+    }
   }
 }

@@ -1,3 +1,16 @@
+<div class="header">
+  <h1>Gestión de Productos</h1>
+  <div>
+    <!-- Botón para iniciar sesión -->
+    <button *ngIf="!isLoggedIn" (click)="redirectToLogin()">Login</button>
+
+    <!-- Botón para cerrar sesión -->
+    <button *ngIf="isLoggedIn" (click)="logout()">Cerrar sesión</button>
+
+    <button (click)="redirectToPerfil()">Perfil</button>
+  </div>
+</div>
+
 <div class="container">
   <h2>Productos</h2>
 

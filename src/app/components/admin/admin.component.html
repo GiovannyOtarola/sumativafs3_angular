@@ -1,3 +1,7 @@
+<div>
+  <button (click)="logout()">Cerrar sesión</button>
+</div>
+
 <div *ngIf="editingUser">
     <h2>Editar Usuario</h2>
     <form [formGroup]="editUserForm" (ngSubmit)="updateUser()">
@@ -43,6 +47,7 @@
         <td>{{ user.email }}</td>
         <td>{{ user.role }}</td>
         <td><button (click)="editUser(user)">Editar</button></td>
+        <button (click)="deleteUser(user)">Eliminar</button>
       </tr>
     </tbody>
   </table>

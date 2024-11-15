@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { ProductoService, Producto } from '../services/producto.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { SessionService } from '../services/session.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-principal',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule],
+  imports: [CommonModule,ReactiveFormsModule,RouterModule],
   templateUrl: './principal.component.html',
   styleUrl: './principal.component.css'
 })
@@ -16,8 +18,9 @@ export class PrincipalComponent implements OnInit {
   editingProducto: Producto | null = null;
   successMessage: string = '';
   errorMessage: string = '';
+  isLoggedIn: boolean = false;
 
-  constructor(private productoService: ProductoService, private fb: FormBuilder) {
+  constructor(private productoService: ProductoService, private fb: FormBuilder, private sessionService: SessionService,private router: Router) {
     this.productoForm = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
@@ -26,6 +29,9 @@ export class PrincipalComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Verificar estado de login
+    this.isLoggedIn = this.sessionService.getSessionStatus();
+
     // Obtener todos los productos cuando se inicialice el componente
     this.productoService.getAllProductos().subscribe(productos => {
       this.productos = productos;
@@ -118,5 +124,21 @@ export class PrincipalComponent implements OnInit {
     this.productoForm.reset();
     this.successMessage = '';
     this.errorMessage = '';
+  }
+
+   // Redirigir al login
+   redirectToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  // Cerrar sesión
+  logout(): void {
+    this.sessionService.logout();
+    this.isLoggedIn = false; // Actualizar estado
+    this.router.navigate(['/']); // Opcional: redirigir a la página principal
+  }
+
+  redirectToPerfil(): void {
+    this.router.navigate(['/perfil']);
   }
 }

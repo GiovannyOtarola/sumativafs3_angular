@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { SessionService } from '../services/session.service';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
+    private sessionService: SessionService,
     private router: Router,
     private fb: FormBuilder  // Inyectamos FormBuilder para crear el formulario
   ) {
@@ -30,34 +32,31 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Si ya hay un usuario logueado, redirige a la página correspondiente
-    this.authService.getCurrentUser().subscribe((user) => {
-      if (user) {
-        if (user.role === 'admin') {
-          this.router.navigate(['/admin']);
-        } else if (user.role === 'user') {
-          this.router.navigate(['/principal']);
-        }
+    // Verificar si ya hay un usuario logueado
+    const user = this.sessionService.getLoggedInUser();
+    if (user) {
+      if (user.role === 'admin') {
+        this.router.navigate(['/admin']);
+      } else if (user.role === 'user') {
+        this.router.navigate(['/principal']);
       }
-    });
+    }
   }
-
+  
   login(): void {
     const { email, password } = this.loginForm.value;
     this.authService.login({ email, password }).subscribe(
       (response: any) => {
         if (response.success) {
-          this.authService.getCurrentUser().subscribe((user) => {
+          this.authService.getCurrentUser().subscribe(user => {
             if (user) {
+              // Guardar el usuario en la sesión y redirigir
+              this.sessionService.login(user);
               if (user.role === 'admin') {
                 this.router.navigate(['/admin']);
               } else if (user.role === 'user') {
                 this.router.navigate(['/principal']);
-              } else {
-                this.errorMessage = 'El usuario no tiene un rol asignado.';
               }
-            } else {
-              this.errorMessage = 'Usuario no encontrado.';
             }
           });
         } else {
@@ -68,5 +67,13 @@ export class LoginComponent implements OnInit {
         this.errorMessage = 'Error de conexión o datos incorrectos. Inténtalo de nuevo.';
       }
     );
+  }
+
+  redirectToRegister(): void {
+    this.router.navigate(['/registro']);
+  }
+
+  redirectToRecoverPassword(): void {
+    this.router.navigate(['/recuperar']);
   }
 }

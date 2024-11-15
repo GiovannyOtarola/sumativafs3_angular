@@ -18,6 +18,8 @@
       </label>
   
       <button type="submit">Guardar cambios</button>
+
+      <button (click)="redirectToPrincipal()">Volver</button>
     </form>
   
     <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
