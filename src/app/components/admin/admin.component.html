@@ -1,38 +1,50 @@
-<div>
-  <button (click)="logout()">Cerrar sesión</button>
-</div>
+<div class="container mt-5">
+  <!-- Cerrar sesión -->
+  <div class="text-end mb-4">
+    <button (click)="logout()" class="btn btn-danger">Cerrar sesión</button>
+  </div>
 
-<div *ngIf="editingUser">
-    <h2>Editar Usuario</h2>
+  <!-- Editar usuario -->
+  <div *ngIf="editingUser">
+    <h2 class="mb-4">Editar Usuario</h2>
     <form [formGroup]="editUserForm" (ngSubmit)="updateUser()">
-      <div>
-        <label for="username">Nombre de usuario</label>
-        <input id="username" formControlName="username" />
+      <div class="mb-3">
+        <label for="username" class="form-label">Nombre de usuario</label>
+        <input id="username" formControlName="username" class="form-control" />
       </div>
-      <div>
-        <label for="email">Email</label>
-        <input id="email" formControlName="email" />
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input id="email" formControlName="email" class="form-control" />
       </div>
-      <div>
-        <label for="password">Contraseña</label>
-        <input id="password" formControlName="password" type="password" />
+      <div class="mb-3">
+        <label for="password" class="form-label">Contraseña</label>
+        <input id="password" formControlName="password" type="password" class="form-control" />
       </div>
-      <div>
-        <label for="role">Rol</label>
-        <select id="role" formControlName="role">
-          <option value="admin">admin</option>
-          <option value="user">user</option>
+      <div class="mb-3">
+        <label for="role" class="form-label">Rol</label>
+        <select id="role" formControlName="role" class="form-select">
+          <option value="admin">Admin</option>
+          <option value="user">User</option>
         </select>
       </div>
-      <button type="submit">Actualizar Usuario</button>
-      <button type="button" (click)="cancelEdit()">Cancelar</button>
+      <div class="d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">Actualizar Usuario</button>
+        <button type="button" (click)="cancelEdit()" class="btn btn-secondary">Cancelar</button>
+      </div>
     </form>
-    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+    <!-- Mensajes de éxito y error -->
+    <div *ngIf="successMessage" class="alert alert-success mt-3">
+      {{ successMessage }}
+    </div>
+    <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+      {{ errorMessage }}
+    </div>
   </div>
-  
-  <h2>Usuarios</h2>
-  <table>
+
+  <!-- Tabla de usuarios -->
+  <h2 class="mt-5">Usuarios</h2>
+  <table class="table table-striped mt-3">
     <thead>
       <tr>
         <th>Nombre de usuario</th>
@@ -46,8 +58,11 @@
         <td>{{ user.username }}</td>
         <td>{{ user.email }}</td>
         <td>{{ user.role }}</td>
-        <td><button (click)="editUser(user)">Editar</button></td>
-        <button (click)="deleteUser(user)">Eliminar</button>
+        <td>
+          <button (click)="editUser(user)" class="btn btn-warning btn-sm">Editar</button>
+          <button (click)="deleteUser(user)" class="btn btn-danger btn-sm">Eliminar</button>
+        </td>
       </tr>
     </tbody>
   </table>
+</div>

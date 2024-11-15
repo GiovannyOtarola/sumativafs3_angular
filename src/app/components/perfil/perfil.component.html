@@ -1,27 +1,38 @@
-<div *ngIf="user">
-    <h2>Perfil de {{ user.username }}</h2>
-  
-    <form (ngSubmit)="saveChanges()">
-      <label>
-        Nombre de usuario:
-        <input type="text" [(ngModel)]="editableUser.username" name="username" required />
-      </label>
-  
-      <label>
-        Email:
-        <input type="email" [(ngModel)]="editableUser.email" name="email" required />
-      </label>
-  
-      <label>
-        Contraseña:
-        <input type="password" [(ngModel)]="editableUser.password" name="password" required />
-      </label>
-  
-      <button type="submit">Guardar cambios</button>
+<div class="container mt-5 d-flex justify-content-center align-items-center" style="min-height: 100vh;">
+  <div class="w-100" style="max-width: 500px;">
+    <!-- Perfil de usuario -->
+    <div *ngIf="user">
+      <h2 class="text-center mb-4">Perfil de {{ user.username }}</h2>
+    
+      <form (ngSubmit)="saveChanges()">
+        <div class="mb-3">
+          <label for="username" class="form-label">Nombre de usuario:</label>
+          <input id="username" type="text" [(ngModel)]="editableUser.username" name="username" class="form-control" required />
+        </div>
+    
+        <div class="mb-3">
+          <label for="email" class="form-label">Email:</label>
+          <input id="email" type="email" [(ngModel)]="editableUser.email" name="email" class="form-control" required />
+        </div>
+    
+        <div class="mb-3">
+          <label for="password" class="form-label">Contraseña:</label>
+          <input id="password" type="password" [(ngModel)]="editableUser.password" name="password" class="form-control" required />
+        </div>
+    
+        <div class="d-flex justify-content-between">
+          <button type="submit" class="btn btn-primary">Guardar cambios</button>
+          <button (click)="redirectToPrincipal()" class="btn btn-secondary">Volver</button>
+        </div>
+      </form>
 
-      <button (click)="redirectToPrincipal()">Volver</button>
-    </form>
-  
-    <div *ngIf="successMessage" class="success">{{ successMessage }}</div>
-    <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+      <!-- Mensajes de éxito y error -->
+      <div *ngIf="successMessage" class="alert alert-success mt-3">
+        {{ successMessage }}
+      </div>
+      <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+        {{ errorMessage }}
+      </div>
+    </div>
   </div>
+</div>
