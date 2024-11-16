@@ -67,9 +67,12 @@ export class AdminComponent implements OnInit {
       };
 
       this.authService.updateProfile(updatedUser).subscribe(response => {
+        console.log('Update response:', response);
         if (response.success) {
           this.successMessage = 'Usuario actualizado correctamente.';
           this.errorMessage = '';
+          this.editingUser = null;  // Limpiar la edición después de actualizar
+          this.editUserForm.reset();
           
           // Actualizar la lista de usuarios
           this.authService.getAllUsers().subscribe(users => {

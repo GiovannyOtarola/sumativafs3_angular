@@ -34,7 +34,7 @@ export class RegistroComponent {
 
     const hasMinLength = value.length >= 4;
     const hasMaxLength = value.length <= 20;
-    const hasSpecialChar = /[!&#64;#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value);
+    const hasSpecialChar = /[!&@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/.test(value);
     const hasNumber = /\d/.test(value);
     const hasLetter = /[a-zA-Z]/.test(value);
 

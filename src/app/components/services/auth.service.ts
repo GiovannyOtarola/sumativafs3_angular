@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
+import { SessionService } from './session.service';
 
 export interface User {
     username: string;
@@ -17,7 +18,7 @@ export class AuthService {
     private current: User | null = null;
     private currentUserSubject: BehaviorSubject<User | null> = new BehaviorSubject<User | null>(null);
   
-    constructor() {
+    constructor(private sessionService: SessionService) {
       // Verificar si ya existe un usuario logueado
       const loggedInUser = localStorage.getItem('currentUser');
       if (loggedInUser) {
@@ -75,12 +76,18 @@ export class AuthService {
     updateProfile(updated: User): Observable<any> {
       const index = this.users.findIndex(u => u.email === updated.email);
       if (index !== -1) {
+        // Verificar si el usuario que está siendo editado es el usuario logueado
+        if (this.sessionService.getLoggedInUser()?.email === updated.email) {
+          // Solo actualiza el loggedInUser si es el usuario autenticado
+          this.sessionService.login(updated);  // Actualiza el usuario logueado en la sesión
+        }
+    
+        // Actualiza la lista de usuarios
         this.users[index] = updated;
-        this.current = updated;
-        this.currentUserSubject.next(updated);
-        this.saveUsersToLocalStorage();  // Guardar cambios en LocalStorage
+        this.saveUsersToLocalStorage();  // Guarda los cambios en el localStorage
         return of({ success: true }).pipe(delay(1000));
       }
+    
       return of({ success: false, message: 'Usuario no encontrado' }).pipe(delay(1000));
     }
   
