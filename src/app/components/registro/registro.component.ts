@@ -1,28 +1,27 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../services/auth.service';
 import { FormBuilder, FormGroup, Validators,AbstractControl , ValidationErrors, ReactiveFormsModule  } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
+import { UsuarioService } from '../services/usuario.service'; // Importa el servicio de usuario
+import { Usuario } from '../../models/usuario.model'; // Importa el modelo de usuario
 
 @Component({
   selector: 'app-registro',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule,RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './registro.component.html',
-  styleUrl: './registro.component.css'
+  styleUrls: ['./registro.component.css'] // Corrige 'styleUrl' a 'styleUrls'
 })
-
 export class RegistroComponent {
   registerForm: FormGroup;
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  constructor(private fb: FormBuilder, private authService: AuthService,private router: Router) {
+  constructor(private fb: FormBuilder, private usuarioService: UsuarioService, private router: Router) {
     this.registerForm = this.fb.group({
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      nombre: ['', Validators.required], // Cambia 'username' a 'nombre'
       password: ['', [Validators.required, this.passwordValidator]], // Validación personalizada de contraseña
-      role: ['user']
+      rol: ['user'] // Cambia 'role' a 'rol'
     });
   }
 
@@ -53,17 +52,19 @@ export class RegistroComponent {
 
   onRegister() {
     if (this.registerForm.valid) {
-      this.authService.register(this.registerForm.value).subscribe({
+      const usuario: Usuario = {
+        ...this.registerForm.value, // Propiedades de nombre y password
+        rol: 'user' // Establecer el rol por defecto
+      };
+      this.usuarioService.crearUsuario(usuario).subscribe({
         next: (response) => {
-          if (response.success) {
-            this.successMessage = 'Registro exitoso!';
-            this.errorMessage = null;
-            this.registerForm.reset();
-
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 2000);
-          }
+          this.successMessage = 'Registro exitoso!';
+          this.errorMessage = null;
+          this.registerForm.reset();
+  
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 2000);
         },
         error: () => {
           this.successMessage = null;

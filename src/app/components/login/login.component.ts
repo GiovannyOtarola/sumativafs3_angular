@@ -1,64 +1,52 @@
 import { Component,OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from '../services/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { SessionService } from '../services/session.service';
+import { UsuarioService } from '../services/usuario.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule,RouterModule,ReactiveFormsModule ],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  email: string = '';
-  password: string = '';
-  errorMessage: string = '';
   loginForm: FormGroup;
+  errorMessage: string = '';
 
   constructor(
-    private authService: AuthService,
+    private fb: FormBuilder,
+    private usuarioService: UsuarioService,
     private sessionService: SessionService,
-    private router: Router,
-    private fb: FormBuilder  // Inyectamos FormBuilder para crear el formulario
+    private router: Router
   ) {
-    // Inicializamos loginForm
+    // Inicializamos el formulario de inicio de sesión
     this.loginForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
+      nombre: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
   }
 
   ngOnInit(): void {
     // Verificar si ya hay un usuario logueado
-    const user = this.sessionService.getLoggedInUser();
+    const user = this.sessionService.getLoggedInUser ();
     if (user) {
-      if (user.role === 'admin') {
-        this.router.navigate(['/admin']);
-      } else if (user.role === 'user') {
-        this.router.navigate(['/principal']);
-      }
+      // Redirigir según el rol del usuario
+      this.router.navigate([user.rol === 'admin' ? '/admin' : '/principal']);
     }
   }
-  
+
   login(): void {
-    const { email, password } = this.loginForm.value;
-    this.authService.login({ email, password }).subscribe(
+    const { nombre, password } = this.loginForm.value;
+    this.usuarioService.login({ nombre, password }).subscribe(
       (response: any) => {
-        if (response.success) {
-          this.authService.getCurrentUser().subscribe(user => {
-            if (user) {
-              // Guardar el usuario en la sesión y redirigir
-              this.sessionService.login(user);
-              if (user.role === 'admin') {
-                this.router.navigate(['/admin']);
-              } else if (user.role === 'user') {
-                this.router.navigate(['/principal']);
-              }
-            }
-          });
+        if (response.message === "Inicio de sesión exitoso") { // Cambia success a message
+          // Guardar el usuario en la sesión
+          this.sessionService.login(response.usuario); // Cambia user a usuario
+          // Redirigir según el rol del usuario
+          this.router.navigate([response.usuario.rol === 'admin' ? '/admin' : '/principal']);
         } else {
           this.errorMessage = response.message || 'Error al intentar iniciar sesión.';
         }

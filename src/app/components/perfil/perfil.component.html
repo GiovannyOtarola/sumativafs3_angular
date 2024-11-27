@@ -6,20 +6,20 @@
     
       <form (ngSubmit)="saveChanges()">
         <div class="mb-3">
-          <label for="username" class="form-label">Nombre de usuario:</label>
-          <input id="username" type="text" [(ngModel)]="editableUser.username" name="username" class="form-control" required />
+          <label for="nombre" class="form-label">Nombre de usuario:</label>
+          <input id="nombre" type="text" [(ngModel)]="editableUser .nombre" name="nombre" class="form-control" required />
         </div>
-    
-        <div class="mb-3">
-          <label for="email" class="form-label">Email:</label>
-          <input id="email" type="email" [(ngModel)]="editableUser.email" name="email" class="form-control" required />
-        </div>
-    
+        
         <div class="mb-3">
           <label for="password" class="form-label">Contraseña:</label>
-          <input id="password" type="password" [(ngModel)]="editableUser.password" name="password" class="form-control" required />
+          <input id="password" type="password" [(ngModel)]="editableUser .password" name="password" class="form-control" required />
         </div>
-    
+
+        <div class="mb-3">
+          <label for="rol" class="form-label">Rol</label>
+          <input id="rol" type="text" [(ngModel)]="editableUser.rol" name="rol" class="form-control" readonly />
+
+        </div>
         <div class="d-flex justify-content-between">
           <button type="submit" class="btn btn-primary">Guardar cambios</button>
           <button (click)="redirectToPrincipal()" class="btn btn-secondary">Volver</button>

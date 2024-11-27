@@ -1,56 +1,35 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of } from 'rxjs';
+import { Producto, ProductoDTO } from '../../models/producto.model'; 
+import { HttpClient } from '@angular/common/http';
 
-export interface Producto {
-  id: number;
-  nombre: string;
-  descripcion: string;
-  precio: number;
-}
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductoService {
-  private productos: Producto[] = [
-    { id: 1, nombre: 'Producto 1', descripcion: 'Descripción del producto 1', precio: 100 },
-    { id: 2, nombre: 'Producto 2', descripcion: 'Descripción del producto 2', precio: 200 },
-  ];
-  private productosSubject: BehaviorSubject<Producto[]> = new BehaviorSubject<Producto[]>(this.productos);
+  private baseUrl = 'http://localhost:8080/api/productos'; 
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
-  // Obtener todos los productos
-  getAllProductos(): Observable<Producto[]> {
-    return this.productosSubject.asObservable();
+  crearProducto(producto: Producto): Observable<Producto> {
+    return this.http.post<Producto>(this.baseUrl, producto);
   }
 
-  // Agregar un nuevo producto
-  addProducto(producto: Producto): Observable<any> {
-    this.productos.push(producto);
-    this.productosSubject.next(this.productos);
-    return of({ success: true });
+  obtenerProductoPorId(id: number): Observable<Producto> {
+    return this.http.get<Producto>(`${this.baseUrl}/${id}`);
   }
 
-  // Actualizar un producto
-  updateProducto(updated: Producto): Observable<any> {
-    const index = this.productos.findIndex(p => p.id === updated.id);
-    if (index !== -1) {
-      this.productos[index] = updated;
-      this.productosSubject.next(this.productos);
-      return of({ success: true });
-    }
-    return of({ success: false, message: 'Producto no encontrado' });
+  actualizarProducto(id: number, producto: Producto): Observable<Producto> {
+    return this.http.put<Producto>(`${this.baseUrl}/${id}`, producto);
   }
 
-  // Eliminar un producto
-  deleteProducto(id: number): Observable<any> {
-    const index = this.productos.findIndex(p => p.id === id);
-    if (index !== -1) {
-      this.productos.splice(index, 1);
-      this.productosSubject.next(this.productos);
-      return of({ success: true });
-    }
-    return of({ success: false, message: 'Producto no encontrado' });
+  eliminarProducto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  obtenerTodosLosProductos(): Observable<ProductoDTO[]> {
+    return this.http.get<ProductoDTO[]>(this.baseUrl);
   }
 }

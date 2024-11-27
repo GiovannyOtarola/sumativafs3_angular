@@ -4,18 +4,10 @@
 
     <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
       <div class="mb-3">
-        <label for="username" class="form-label">Nombre de usuario:</label>
-        <input id="username" formControlName="username" class="form-control" />
-        <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="text-danger">
+        <label for="nombre" class="form-label">Nombre de usuario:</label>
+        <input id="nombre" formControlName="nombre" class="form-control" />
+        <div *ngIf="registerForm.get('nombre')?.invalid && registerForm.get('nombre')?.touched" class="text-danger">
           El nombre de usuario es requerido.
-        </div>
-      </div>
-
-      <div class="mb-3">
-        <label for="email" class="form-label">Correo electrónico:</label>
-        <input id="email" formControlName="email" type="email" class="form-control" />
-        <div *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched" class="text-danger">
-          Ingrese un correo electrónico válido.
         </div>
       </div>
 

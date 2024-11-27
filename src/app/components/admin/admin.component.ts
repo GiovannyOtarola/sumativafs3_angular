@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User } from '../services/auth.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SessionService } from '../services/session.service';
 import { Router, RouterModule } from '@angular/router';
+import { UsuarioService } from '../services/usuario.service';
+import { Usuario } from '../../models/usuario.model';
 
 @Component({
   selector: 'app-admin',
@@ -13,73 +14,76 @@ import { Router, RouterModule } from '@angular/router';
   styleUrl: './admin.component.css'
 })
 export class AdminComponent implements OnInit {
-  users: User[] = [];
+  users: Usuario[] = [];
   editUserForm: FormGroup;
-  editingUser: User | null = null;
+  editingUser: Usuario  | null = null;
   successMessage: string = '';
   errorMessage: string = '';
 
-  constructor(private authService: AuthService, private fb: FormBuilder, private sessionService: SessionService,private router: Router,) {
+  
+  constructor(
+    private fb: FormBuilder,
+    private sessionService: SessionService,
+    private usuarioService: UsuarioService,
+    private router: Router
+  ) {
     // Inicialización del formulario de edición
     this.editUserForm = this.fb.group({
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      nombre: ['', Validators.required],
       password: ['', Validators.required],
-      role: ['', Validators.required]
+      rol: ['', Validators.required]
     });
   }
 
   ngOnInit(): void {
     // Verificar si el usuario tiene permisos de administrador
-    const currentUser = this.sessionService.getLoggedInUser();
-    if (!this.sessionService.getSessionStatus() || !currentUser || currentUser.role !== 'admin') {
+    const currentUser  = this.sessionService.getLoggedInUser ();
+    if (!this.sessionService.getSessionStatus() || !currentUser  || currentUser .rol !== 'admin') {
       this.router.navigate(['/login']); // Redirigir si no es administrador
       return;
     }
 
     // Obtener todos los usuarios
-    this.authService.getAllUsers().subscribe(users => {
+    this.usuarioService.obtenerTodosLosUsuarios().subscribe(users => {
       this.users = users;
     });
   }
 
-  editUser(user: User): void {
+  editUser (user: Usuario): void {
     // Rellenar el formulario con los datos del usuario
-    this.editingUser = user;
+    this.editingUser  = user;
     this.editUserForm.patchValue({
-      username: user.username,
-      email: user.email,
+      nombre: user.nombre,
       password: user.password,
-      role: user.role
+      rol: user.rol
     });
   }
 
-  updateUser(): void {
+  updateUser (): void {
     if (this.editUserForm.invalid) {
       this.errorMessage = 'Por favor, completa todos los campos correctamente.';
       return;
     }
 
-    if (this.editingUser) {
-      const updatedUser: User = {
-        ...this.editingUser,
+    if (this.editingUser ) {
+      const updatedUser: Usuario  = {
+        ...this.editingUser ,
         ...this.editUserForm.value
       };
 
-      this.authService.updateProfile(updatedUser).subscribe(response => {
-        console.log('Update response:', response);
-        if (response.success) {
+      this.usuarioService.actualizarUsuario(updatedUser.id!, updatedUser ).subscribe(response => {
+        if (response) {
           this.successMessage = 'Usuario actualizado correctamente.';
           this.errorMessage = '';
-          this.editingUser = null;  // Limpiar la edición después de actualizar
+          this.editingUser  = null;  // Limpiar la edición después de actualizar
           this.editUserForm.reset();
-          
+
           // Actualizar la lista de usuarios
-          this.authService.getAllUsers().subscribe(users => {
+          this.usuarioService.obtenerTodosLosUsuarios().subscribe(users => {
             this.users = users;
           });
         } else {
-          this.errorMessage = response.message || 'Error al actualizar el usuario';
+          this.errorMessage = 'Error al actualizar el usuario';
         }
       });
     }
@@ -87,7 +91,7 @@ export class AdminComponent implements OnInit {
 
   cancelEdit(): void {
     // Cancelar la edición y limpiar los mensajes
-    this.editingUser = null;
+    this.editingUser  = null;
     this.successMessage = '';
     this.errorMessage = '';
     this.editUserForm.reset();
@@ -98,19 +102,20 @@ export class AdminComponent implements OnInit {
     this.router.navigate(['/login']); // Redirige al login
   }
 
-  deleteUser(user: User): void {
+  deleteUser (user: Usuario): void {
     if (confirm('¿Estás seguro de que deseas eliminar este usuario?')) {
-      this.authService.deleteUser(user).subscribe(response => {
-        if (response.success) {
+      this.usuarioService.eliminarUsuario(user.id!).subscribe({
+        next: () => {
           this.successMessage = 'Usuario eliminado correctamente.';
           this.errorMessage = '';
-          
+  
           // Actualizar la lista de usuarios después de la eliminación
-          this.authService.getAllUsers().subscribe(users => {
+          this.usuarioService.obtenerTodosLosUsuarios().subscribe(users => {
             this.users = users;
           });
-        } else {
-          this.errorMessage = response.message || 'Error al eliminar el usuario';
+        },
+        error: () => {
+          this.errorMessage = 'Error al eliminar el usuario';
         }
       });
     }
