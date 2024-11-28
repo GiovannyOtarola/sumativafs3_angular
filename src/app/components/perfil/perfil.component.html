@@ -17,9 +17,9 @@
 
         <div class="mb-3">
           <label for="rol" class="form-label">Rol</label>
-          <input id="rol" type="text" [(ngModel)]="editableUser.rol" name="rol" class="form-control" readonly />
-
+          <span class="form-control-plaintext">{{ editableUser.rol }}</span>
         </div>
+        
         <div class="d-flex justify-content-between">
           <button type="submit" class="btn btn-primary">Guardar cambios</button>
           <button (click)="redirectToPrincipal()" class="btn btn-secondary">Volver</button>

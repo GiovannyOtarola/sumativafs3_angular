@@ -39,6 +39,7 @@ export class SessionService {
     }
   
     getSessionStatus(): boolean {
+      console.log('Estado de sesión:', this.isLoggedIn);
       return this.isLoggedIn;
     }
   
@@ -46,4 +47,6 @@ export class SessionService {
       console.log('Obteniendo usuario logueado:', this.loggedInUser);
       return this.loggedInUser;
     }
+
+    
   }

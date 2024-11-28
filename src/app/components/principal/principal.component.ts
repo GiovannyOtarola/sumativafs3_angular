@@ -20,6 +20,7 @@ export class PrincipalComponent implements OnInit {
   successMessage: string = '';
   errorMessage: string = '';
   isLoggedIn: boolean = false;
+  usuarioId: number | null = null; // Variable para almacenar el ID del usuario autenticado
 
   constructor(
     private productoService: ProductoService,
@@ -42,11 +43,25 @@ export class PrincipalComponent implements OnInit {
     if (!this.isLoggedIn) {
       this.router.navigate(['/login']);
     } else {
-      // Obtener todos los productos cuando se inicialice el componente
-      this.productoService.obtenerTodosLosProductos().subscribe(productos => {
-        this.productos = productos;
-      });
+      // Obtener el usuario logueado desde el SessionService
+      const loggedInUser = this.sessionService.getLoggedInUser();
+      this.usuarioId = loggedInUser ? loggedInUser.id : null;
+
+      // Obtener todos los productos
+      this.loadProductos();
     }
+  }
+
+  loadProductos(): void {
+    this.productoService.obtenerTodosLosProductos().subscribe({
+      next: (productos) => {
+        this.productos = productos;
+      },
+      error: (err) => {
+        this.errorMessage = 'Error al obtener los productos.';
+        console.error(err);
+      }
+    });
   }
 
   // Agregar o actualizar producto
@@ -58,27 +73,45 @@ export class PrincipalComponent implements OnInit {
 
     const producto: Producto = this.productoForm.value;
 
-    
+    // Agregar el usuario_id al producto antes de enviarlo
+    if (this.usuarioId) {
+      producto.usuarioId = this.usuarioId;
+    } else {
+      this.errorMessage = 'No se pudo obtener el ID del usuario.';
+      return;
+    }
+
     if (this.editingProducto) {
       // Si estamos editando un producto, lo actualizamos
       if (this.editingProducto.id !== undefined) {
-        this.productoService.actualizarProducto(this.editingProducto.id, producto).subscribe(response => {
-          this.successMessage = 'Producto actualizado correctamente.';
-          this.errorMessage = '';
-          this.refreshProductList();
+        this.productoService.actualizarProducto(this.editingProducto.id, producto).subscribe({
+          next: () => {
+            this.successMessage = 'Producto actualizado correctamente.';
+            this.refreshProductList();
+          },
+          error: (err) => {
+            this.errorMessage = 'Error al actualizar el producto.';
+            console.error(err);
+          }
         });
       } else {
         this.errorMessage = 'ID del producto no está definido.';
       }
     } else {
       // Si estamos agregando un nuevo producto
-      this.productoService.crearProducto(producto).subscribe(response => {
-        this.successMessage = 'Producto creado correctamente.';
-        this.errorMessage = '';
-        this.refreshProductList();
+      this.productoService.crearProducto(producto).subscribe({
+        next: () => {
+          this.successMessage = 'Producto creado correctamente.';
+          this.refreshProductList();
+        },
+        error: (err) => {
+          this.errorMessage = 'Error al crear el producto.';
+          console.error(err);
+        }
       });
     }
 
+    // Limpiar el formulario y finalizar la edición
     this.productoForm.reset();
     this.editingProducto = null;
   }
@@ -95,18 +128,21 @@ export class PrincipalComponent implements OnInit {
 
   // Eliminar producto
   deleteProducto(id: number): void {
-    this.productoService.eliminarProducto(id).subscribe(response => {
-      this.successMessage = 'Producto eliminado correctamente.';
-      this.errorMessage = '';
-      this.refreshProductList();
+    this.productoService.eliminarProducto(id).subscribe({
+      next: () => {
+        this.successMessage = 'Producto eliminado correctamente.';
+        this.refreshProductList();
+      },
+      error: (err) => {
+        this.errorMessage = 'Error al eliminar el producto.';
+        console.error(err);
+      }
     });
   }
 
   // Método para refrescar la lista de productos
   refreshProductList(): void {
-    this.productoService.obtenerTodosLosProductos().subscribe(productos => {
-      this.productos = productos;
-    });
+    this.loadProductos();  // Reutiliza el método que ya carga los productos
   }
 
   // Cancelar edición
@@ -123,11 +159,12 @@ export class PrincipalComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-   // Redirigir al login
-   redirectToLogin(): void {
+  // Redirigir al login
+  redirectToLogin(): void {
     this.router.navigate(['/login']);
   }
 
+  // Redirigir al perfil del usuario
   redirectToPerfil(): void {
     this.router.navigate(['/perfil']);
   }

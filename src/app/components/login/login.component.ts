@@ -42,11 +42,17 @@ export class LoginComponent implements OnInit {
     const { nombre, password } = this.loginForm.value;
     this.usuarioService.login({ nombre, password }).subscribe(
       (response: any) => {
-        if (response.message === "Inicio de sesión exitoso") { // Cambia success a message
-          // Guardar el usuario en la sesión
-          this.sessionService.login(response.usuario); // Cambia user a usuario
-          // Redirigir según el rol del usuario
-          this.router.navigate([response.usuario.rol === 'admin' ? '/admin' : '/principal']);
+        if (response.message === "Inicio de sesión exitoso") {
+          this.sessionService.login(response.usuario); // Guardar el usuario en la sesión
+  
+          // Verificar si el usuario está correctamente logueado
+          if (this.sessionService.getSessionStatus()) {
+            console.log('Usuario logueado correctamente:', this.sessionService.getLoggedInUser());
+            // Redirigir según el rol del usuario
+            this.router.navigate([response.usuario.rol === 'admin' ? '/admin' : '/principal']);
+          } else {
+            console.error('El usuario no está logueado correctamente.');
+          }
         } else {
           this.errorMessage = response.message || 'Error al intentar iniciar sesión.';
         }

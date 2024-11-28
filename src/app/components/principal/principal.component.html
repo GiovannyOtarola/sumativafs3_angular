@@ -1,71 +1,69 @@
-<div class="header d-flex justify-content-between align-items-center p-3 mb-4 bg-light">
-  <h1>Gestión de Productos</h1>
-  <div>
-    <!-- Botón para iniciar sesión -->
-    <button *ngIf="!isLoggedIn" (click)="redirectToLogin()" class="btn btn-primary me-2">Login</button>
-
-    <!-- Botón para cerrar sesión -->
-    <button *ngIf="isLoggedIn" (click)="logout()" class="btn btn-danger me-2">Cerrar sesión</button>
-
-    <button (click)="redirectToPerfil()" class="btn btn-info">Perfil</button>
+<div class="container mt-4">
+  <!-- Mensajes de éxito y error -->
+  <div *ngIf="successMessage" class="alert alert-success">
+    {{ successMessage }}
   </div>
-</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
 
-<div class="container">
-  <h2>Productos</h2>
+  <!-- Mostrar lista de productos -->
+  <div class="mb-4">
+    <h2>Lista de Productos</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let producto of productos">
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.descripcion }}</td>
+          <td>{{ producto.precio | currency }}</td>
+          <td>
+            <button class="btn btn-primary btn-sm" (click)="editProducto(producto)">Editar</button>
+            <button class="btn btn-danger btn-sm" (click)="deleteProducto(producto.id ? producto.id : 0)">Eliminar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <!-- Mensajes de éxito o error -->
-  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
-  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
-
-  <!-- Formulario para agregar o editar un producto -->
-  <form [formGroup]="productoForm" (ngSubmit)="saveProducto()">
-    <div class="form-group mb-3">
-      <label for="nombre" class="form-label">Nombre</label>
-      <input type="text" id="nombre" formControlName="nombre" class="form-control" />
+  <!-- Formulario de Producto -->
+  <div class="card">
+    <div class="card-header">
+      <h3>{{ editingProducto ? 'Editar Producto' : 'Agregar Producto' }}</h3>
     </div>
+    <div class="card-body">
+      <form [formGroup]="productoForm" (ngSubmit)="saveProducto()">
+        <div class="form-group">
+          <label for="nombre">Nombre</label>
+          <input id="nombre" formControlName="nombre" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+          <label for="descripcion">Descripción</label>
+          <input id="descripcion" formControlName="descripcion" class="form-control" type="text" />
+        </div>
+        <div class="form-group">
+          <label for="precio">Precio</label>
+          <input id="precio" formControlName="precio" class="form-control" type="number" />
+        </div>
 
-    <div class="form-group mb-3">
-      <label for="descripcion" class="form-label">Descripción</label>
-      <textarea id="descripcion" formControlName="descripcion" class="form-control"></textarea>
+        <button type="submit" class="btn btn-success" [disabled]="productoForm.invalid">
+          {{ editingProducto ? 'Actualizar Producto' : 'Agregar Producto' }}
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Cancelar</button>
+      </form>
     </div>
+  </div>
 
-    <div class="form-group mb-3">
-      <label for="precio" class="form-label">Precio</label>
-      <input type="number" id="precio" formControlName="precio" class="form-control" />
-    </div>
-
-    <div class="d-flex justify-content-between">
-      <button type="submit" class="btn btn-primary" [disabled]="productoForm.invalid">
-        {{ editingProducto ? 'Actualizar Producto' : 'Agregar Producto' }}
-      </button>
-
-      <!-- Botón para cancelar la edición -->
-      <button *ngIf="editingProducto" (click)="cancelEdit()" type="button" class="btn btn-secondary">Cancelar</button>
-    </div>
-  </form>
-
-  <!-- Lista de productos -->
-  <h3 class="mt-5">Lista de Productos</h3>
-  <table class="table table-striped">
-    <thead>
-      <tr>
-        <th>Nombre</th>
-        <th>Descripción</th>
-        <th>Precio</th>
-        <th>Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let producto of productos">
-        <td>{{ producto.nombre }}</td>
-        <td>{{ producto.descripcion }}</td>
-        <td>{{ producto.precio | currency }}</td>
-        <td>
-          <button (click)="editProducto(producto)" class="btn btn-warning me-2">Editar</button>
-          <button (click)="deleteProducto(producto.id!)" class="btn btn-danger">Eliminar</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+  <!-- Botones para navegar -->
+  <div class="mt-4">
+    <button class="btn btn-info" (click)="redirectToPerfil()">Perfil</button>
+    <button class="btn btn-warning" (click)="logout()">Cerrar sesión</button>
+  </div>
 </div>
