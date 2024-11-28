@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ProductoService, Producto } from '../services/producto.service';
+import { ProductoService } from '../services/producto.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SessionService } from '../services/session.service';
 import { Router, RouterModule } from '@angular/router';
+import { Producto } from '../../models/producto.model';
 
 @Component({
   selector: 'app-principal',
@@ -20,7 +21,12 @@ export class PrincipalComponent implements OnInit {
   errorMessage: string = '';
   isLoggedIn: boolean = false;
 
-  constructor(private productoService: ProductoService, private fb: FormBuilder, private sessionService: SessionService,private router: Router) {
+  constructor(
+    private productoService: ProductoService,
+    private fb: FormBuilder,
+    private sessionService: SessionService,
+    private router: Router
+  ) {
     this.productoForm = this.fb.group({
       nombre: ['', Validators.required],
       descripcion: ['', Validators.required],
@@ -32,10 +38,15 @@ export class PrincipalComponent implements OnInit {
     // Verificar estado de login
     this.isLoggedIn = this.sessionService.getSessionStatus();
 
-    // Obtener todos los productos cuando se inicialice el componente
-    this.productoService.getAllProductos().subscribe(productos => {
-      this.productos = productos;
-    });
+    // Redirigir al login si no está logueado
+    if (!this.isLoggedIn) {
+      this.router.navigate(['/login']);
+    } else {
+      // Obtener todos los productos cuando se inicialice el componente
+      this.productoService.obtenerTodosLosProductos().subscribe(productos => {
+        this.productos = productos;
+      });
+    }
   }
 
   // Agregar o actualizar producto
@@ -47,45 +58,24 @@ export class PrincipalComponent implements OnInit {
 
     const producto: Producto = this.productoForm.value;
 
+    
     if (this.editingProducto) {
       // Si estamos editando un producto, lo actualizamos
-      producto.id = this.editingProducto.id; // Mantener el id
-      this.productoService.updateProducto(producto).subscribe(response => {
-        if (response.success) {
+      if (this.editingProducto.id !== undefined) {
+        this.productoService.actualizarProducto(this.editingProducto.id, producto).subscribe(response => {
           this.successMessage = 'Producto actualizado correctamente.';
           this.errorMessage = '';
-          // Actualizar la lista de productos después de la edición
-          this.productoService.getAllProductos().subscribe(productos => {
-            this.productos = productos;
-          });
-        } else {
-          this.errorMessage = response.message || 'Error al actualizar el producto';
-        }
-      });
+          this.refreshProductList();
+        });
+      } else {
+        this.errorMessage = 'ID del producto no está definido.';
+      }
     } else {
       // Si estamos agregando un nuevo producto
-      // Verificar que no exista un producto con el mismo nombre
-      const existingProduct = this.productos.find(p => p.nombre === producto.nombre);
-      if (existingProduct) {
-        this.errorMessage = 'El producto ya existe.';
-        return;
-      }
-  
-      // Generar un id único para el nuevo producto
-      const newId = this.productos.length ? Math.max(...this.productos.map(p => p.id)) + 1 : 1;
-      producto.id = newId;
-  
-      this.productoService.addProducto(producto).subscribe(response => {
-        if (response.success) {
-          this.successMessage = 'Producto creado correctamente.';
-          this.errorMessage = '';
-          // Obtener todos los productos después de agregar uno nuevo
-          this.productoService.getAllProductos().subscribe(productos => {
-            this.productos = productos;
-          });
-        } else {
-          this.errorMessage = response.message || 'Error al crear el producto';
-        }
+      this.productoService.crearProducto(producto).subscribe(response => {
+        this.successMessage = 'Producto creado correctamente.';
+        this.errorMessage = '';
+        this.refreshProductList();
       });
     }
 
@@ -105,16 +95,17 @@ export class PrincipalComponent implements OnInit {
 
   // Eliminar producto
   deleteProducto(id: number): void {
-    this.productoService.deleteProducto(id).subscribe(response => {
-      if (response.success) {
-        this.successMessage = 'Producto eliminado correctamente.';
-        this.errorMessage = '';
-        this.productoService.getAllProductos().subscribe(productos => {
-          this.productos = productos;
-        });
-      } else {
-        this.errorMessage = response.message || 'Error al eliminar el producto';
-      }
+    this.productoService.eliminarProducto(id).subscribe(response => {
+      this.successMessage = 'Producto eliminado correctamente.';
+      this.errorMessage = '';
+      this.refreshProductList();
+    });
+  }
+
+  // Método para refrescar la lista de productos
+  refreshProductList(): void {
+    this.productoService.obtenerTodosLosProductos().subscribe(productos => {
+      this.productos = productos;
     });
   }
 
@@ -126,16 +117,15 @@ export class PrincipalComponent implements OnInit {
     this.errorMessage = '';
   }
 
-   // Redirigir al login
-   redirectToLogin(): void {
-    this.router.navigate(['/login']);
-  }
-
   // Cerrar sesión
   logout(): void {
     this.sessionService.logout();
-    this.isLoggedIn = false; // Actualizar estado
-    this.router.navigate(['/']); // Opcional: redirigir a la página principal
+    this.router.navigate(['/login']);
+  }
+
+   // Redirigir al login
+   redirectToLogin(): void {
+    this.router.navigate(['/login']);
   }
 
   redirectToPerfil(): void {

@@ -2,7 +2,7 @@
   <div class="w-100" style="max-width: 500px;">
     <!-- Perfil de usuario -->
     <div *ngIf="user">
-      <h2 class="text-center mb-4">Perfil de {{ user.username }}</h2>
+      <h2 class="text-center mb-4">Perfil de {{ user.nombre }}</h2>
     
       <form (ngSubmit)="saveChanges()">
         <div class="mb-3">

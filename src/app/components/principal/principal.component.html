@@ -63,7 +63,7 @@
         <td>{{ producto.precio | currency }}</td>
         <td>
           <button (click)="editProducto(producto)" class="btn btn-warning me-2">Editar</button>
-          <button (click)="deleteProducto(producto.id)" class="btn btn-danger">Eliminar</button>
+          <button (click)="deleteProducto(producto.id!)" class="btn btn-danger">Eliminar</button>
         </td>
       </tr>
     </tbody>
