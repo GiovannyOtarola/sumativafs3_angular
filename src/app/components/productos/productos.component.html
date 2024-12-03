@@ -1,0 +1,42 @@
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Productos Disponibles</h1>
+  
+    <!-- Mensaje de error -->
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
+  
+    <!-- Lista de productos -->
+    <div class="row">
+      <div *ngFor="let producto of productos" class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title">{{ producto.nombre }}</h5>
+            <p class="card-text">{{ producto.descripcion }}</p>
+            <p class="card-text">
+              <strong>Precio:</strong> {{ producto.precio | currency }}
+            </p>
+            <button 
+              class="btn btn-primary w-100"
+              (click)="agregarAlCarrito(producto)">
+              Agregar al Carrito
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Botones para ver el carrito y volver -->
+    <div class="d-flex justify-content-between mt-4">
+      <button 
+        class="btn btn-success"
+        (click)="irAlCarrito()">
+        Ver Carrito
+      </button>
+      <button 
+        class="btn btn-secondary"
+        (click)="volver()">
+        Volver
+      </button>
+    </div>
+  </div>

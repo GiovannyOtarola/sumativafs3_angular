@@ -164,6 +164,11 @@ export class PrincipalComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  // Redirigir al login
+  redirectToProductos(): void {
+    this.router.navigate(['/productos']);
+  }
+
   // Redirigir al perfil del usuario
   redirectToPerfil(): void {
     this.router.navigate(['/perfil']);

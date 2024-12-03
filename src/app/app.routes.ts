@@ -5,6 +5,8 @@ import { PrincipalComponent } from './components/principal/principal.component';
 import { RegistroComponent } from './components/registro/registro.component';
 import { RecuperarPasswordComponent } from './components/recuperar-password/recuperar-password.component';
 import { AdminComponent } from './components/admin/admin.component';
+import { ProductosComponent } from './components/productos/productos.component';
+import { CarritoComponent } from './components/carrito/carrito.component';
 
 export const routes: Routes = [
 
@@ -15,4 +17,6 @@ export const routes: Routes = [
     {path: 'registro', component: RegistroComponent},
     {path: 'recuperar', component: RecuperarPasswordComponent},
     {path: 'admin', component: AdminComponent},
+    {path: 'productos', component: ProductosComponent},
+    {path: 'carrito', component: CarritoComponent},
 ];
