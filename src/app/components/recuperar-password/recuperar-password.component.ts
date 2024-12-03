@@ -22,6 +22,11 @@ export class RecuperarPasswordComponent {
   }
 
   recuperarPassword(): void {
+    if (this.recuperarForm.invalid) {
+      this.mensaje = 'Por favor, completa todos los campos correctamente.';
+      return;
+    }
+    
     const nombre = this.recuperarForm.value.nombre;
 
     this.usuarioService.obtenerUsuarioPorNombre(nombre).subscribe(

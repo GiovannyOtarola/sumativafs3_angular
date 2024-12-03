@@ -14,7 +14,7 @@ export class UsuarioService {
 
   constructor(private http: HttpClient,private sessionService: SessionService) {}
 
-  private getAuthHeaders(): HttpHeaders {
+  public getAuthHeaders(): HttpHeaders {
     const loggedInUser = this.sessionService.getLoggedInUser();
     if (!loggedInUser) {
       throw new Error('No hay usuario logueado.');
@@ -23,6 +23,10 @@ export class UsuarioService {
     return new HttpHeaders({
       Authorization: 'Basic ' + btoa(`${nombre}:${password}`),
     });
+  }
+
+  public getAuthHeadersPublic(): HttpHeaders {
+    return this.getAuthHeaders();
   }
 
 

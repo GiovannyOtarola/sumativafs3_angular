@@ -5,6 +5,7 @@ import { CompraService } from '../services/compra.service';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { forkJoin } from 'rxjs/internal/observable/forkJoin';
 
 @Component({
   selector: 'app-carrito',
@@ -34,29 +35,31 @@ export class CarritoComponent {
       this.errorMessage = 'El carrito está vacío.';
       return;
     }
-
+  
     const compras = this.carrito.map((producto) => ({
       productoId: producto.id!,
       cantidad: 1, // Por simplicidad, puedes permitir al usuario seleccionar cantidades en el futuro.
-      usuarioId: 1 // Usa el ID del usuario autenticado.
+      usuarioId: 1, // Usa el ID del usuario autenticado.
     }));
-
-    compras.forEach((compra) => {
-      this.compraService.realizarCompra(compra).subscribe({
-        next: () => {
-          this.successMessage = 'Compra realizada correctamente.';
-        },
-        error: (err) => {
-          this.errorMessage = 'Error al realizar la compra.';
-          console.error(err);
-        }
-      });
+  
+    const comprasObservables = compras.map((compra) =>
+      this.compraService.realizarCompra(compra)
+    );
+  
+    // Ejecutar todas las compras en paralelo
+    forkJoin(comprasObservables).subscribe({
+      next: () => {
+        this.successMessage = 'Compra realizada correctamente.';
+        // Vaciar el carrito tras realizar todas las compras
+        this.carritoService.vaciarCarrito();
+        this.carrito = [];
+        this.calcularTotal();
+      },
+      error: (err) => {
+        this.errorMessage = 'Error al realizar la compra.';
+        console.error(err);
+      },
     });
-
-    // Vaciar el carrito tras la compra
-    this.carritoService.vaciarCarrito();
-    this.carrito = [];
-    this.calcularTotal();
   }
 
   calcularTotal(): void {
