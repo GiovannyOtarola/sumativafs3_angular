@@ -148,7 +148,11 @@ export class PrincipalComponent implements OnInit {
   // Cancelar edición
   cancelEdit(): void {
     this.editingProducto = null;
-    this.productoForm.reset();
+    this.productoForm.reset({
+      nombre: '',
+      descripcion: '',
+      precio: ''
+    });
     this.successMessage = '';
     this.errorMessage = '';
   }
