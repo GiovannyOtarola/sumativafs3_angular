@@ -14,6 +14,6 @@ FROM nginx:alpine
 
 COPY --from=build /app/dist/sumativafs3_angular/browser /usr/share/nginx/html
 
-EXPOSE 80
+EXPOSE 4200
 
 CMD ["nginx","-g","daemon off;"]
